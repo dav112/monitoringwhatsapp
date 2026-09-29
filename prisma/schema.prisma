@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  SUPERVISOR
+  CS
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CustomerStatus {
+  NEW
+  FOLLOW_UP
+  COMPLETED
+}
+
+enum InteractionType {
+  MESSAGE
+  CITY_DETECTED
+  STATUS_CHANGED
+  NOTE
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+/// Lifecycle pesan OUTBOUND. Inbound = NULL (tidak ada lifecycle).
+/// Tidak ada timestamp per status — updatedAt berubah tiap transisi (cukup untuk UI).
+enum MessageStatus {
+  SENDING
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         UserRole   @default(CS)
+  status       UserStatus @default(ACTIVE)
+  lastActiveAt DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}
+
+model Customer {
+  id        String         @id @default(cuid())
+  name      String
+  phone     String         @unique
+  city      String?
+  status    CustomerStatus @default(NEW)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  interactions CustomerInteraction[]
+  messages     WhatsAppMessage[]
+
+  @@index([phone])
+  @@index([city])
+  @@index([status])
+  @@index([createdAt])
+  @@map("customers")
+}
+
+model CustomerInteraction {
+  id         String          @id @default(cuid())
+  customerId String
+  customer   Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  type       InteractionType @default(NOTE)
+  content    String
+  createdAt  DateTime        @default(now())
+
+  @@index([customerId])
+  @@index([createdAt])
+  @@map("customer_interactions")
+}
+
+model WhatsAppMessage {
+  id          String           @id @default(cuid())
+  customerId  String?
+  customer    Customer?        @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  messageId   String?  @unique
+  // Kunci idempotency dari client (UUID per submit). Unique mencegah double-send.
+  // Baris "pending": messageId NULL = pengiriman sedang berjalan.
+  clientMessageId String? @unique
+  phone       String
+  messageType String           @default("text")
+  content     String
+  direction   MessageDirection @default(INBOUND)
+  status      MessageStatus?
+  // Info error aman dari Meta (kode + pesan pendek), hanya bila FAILED.
+  statusDetail String?
+  createdAt   DateTime         @default(now())
+
+  @@index([customerId])
+  @@index([phone])
+  @@index([createdAt])
+  // Pola query realtime: direction = INBOUND ORDER BY createdAt DESC, id DESC.
+  @@index([direction, createdAt(sort: Desc), id(sort: Desc)])
+  // Pola workspace: per-customer ORDER BY createdAt DESC, id DESC (aman ribuan pesan).
+  @@index([customerId, createdAt(sort: Desc), id(sort: Desc)])
+  @@map("whatsapp_messages")
+}
+
+model Setting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("settings")
+}
+
+/// Konfigurasi global tunggal WhatsApp Cloud API (satu baris, id = "global").
+/// Secret (access token, verify token, app secret) WAJIB terenkripsi (AES-256-GCM).
+/// ID non-secret disimpan plaintext.
+model WhatsappConfig {
+  id                   String   @id @default("global")
+  accessTokenEncrypted String?
+  phoneNumberId        String?
+  businessAccountId    String?
+  verifyTokenEncrypted String?
+  appSecretEncrypted   String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("whatsapp_config")
+}

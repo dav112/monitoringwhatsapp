@@ -1,0 +1,58 @@
+{
+  "name": "monitoring-whatsapp",
+  "version": "0.1.0",
+  "private": true,
+  "prisma": {
+    "seed": "npx tsx prisma/seed.ts"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test:wa": "tsx scripts/test-whatsapp.ts",
+    "test:export": "tsx scripts/test-export.ts",
+    "test:realtime": "tsx scripts/test-realtime.ts",
+    "test:workspace": "tsx scripts/test-workspace.ts",
+    "test:outbound": "tsx scripts/test-outbound.ts",
+    "test:message-status": "tsx scripts/test-message-status.ts",
+    "smoke:prod": "tsx scripts/smoke-prod.ts",
+    "data:retention": "tsx scripts/data-retention.ts",
+    "test:wa-config": "tsx scripts/test-wa-config.ts",
+    "test:auth": "tsx scripts/test-auth.ts",
+    "test:production-hardening": "tsx scripts/test-production-hardening.ts",
+    "test:final": "tsx scripts/test-final.ts",
+    "test:tutorial": "tsx scripts/test-tutorial.ts",
+    "test:meta-e2e": "tsx scripts/test-meta-e2e.ts",
+    "wa:check": "tsx scripts/wa-check.ts",
+    "db:backup": "bash scripts/backup-db.sh",
+    "db:verify-backup": "bash scripts/verify-backup.sh",
+    "db:restore": "bash scripts/restore-db.sh"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.4",
+    "exceljs": "^4.4.0",
+    "iron-session": "^9.0.1",
+    "next": "16.3.6",
+    "pg": "^8.23.0",
+    "prisma": "^7.10.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  }
+}

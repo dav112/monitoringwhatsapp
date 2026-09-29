@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-cream: #f6f8f4;
+  --color-paper: #fbfcfa;
+  --color-brand-50: #f0fdf4;
+  --color-brand-100: #dcfce7;
+  --color-brand-200: #bbf7d0;
+  --color-brand-300: #a8e6a1;
+  --color-brand-400: #6fce7d;
+  --color-brand-500: #34b06a;
+  --color-brand-600: #1d8a52;
+  --color-brand-700: #166b43;
+  --color-brand-800: #14532d;
+  --color-brand-900: #0f3d23;
+  --color-mist: #eef1eb;
+  --color-stone-soft: #e7eae4;
+  --color-night-900: #0d120f;
+  --color-night-800: #141a16;
+  --color-night-700: #1d2520;
+  --color-night-600: #2a342e;
+  --color-night-100: #e7efe8;
+  --color-night-400: #9db0a3;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+:root {
+  --background: #f6f8f4;
+  --foreground: #0f3d23;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0d120f;
+  --foreground: #e7efe8;
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- lightweight transitions ---------- */
+.page-enter {
+  animation: pageIn 0.35s ease-out both;
+}
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -12px rgba(20, 83, 45, 0.18);
+}
+
+.btn-transition {
+  transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.btn-transition:hover {
+  transform: translateY(-1px);
+}
+.btn-transition:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.row-hover {
+  transition: background-color 0.15s ease;
+}
+
+.sidebar-transition {
+  transition: transform 0.25s ease, width 0.25s ease, opacity 0.25s ease;
+}
+
+/* modal */
+.modal-backdrop {
+  animation: fadeIn 0.2s ease-out both;
+}
+.modal-panel {
+  animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* toast */
+.toast-enter {
+  animation: toastIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* skeleton shimmer - subtle, GPU friendly (opacity only) */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e7eae4;
+}
+.dark .skeleton {
+  background: #2a342e;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #f6f8f4;
+  opacity: 0;
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+}
+.dark .skeleton::after {
+  background: #3a463f;
+}
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.7; }
+}
+
+/* cursor-follow glow - only on .glow-card, uses CSS vars set via rAF */
+.glow-card {
+  position: relative;
+  overflow: hidden;
+}
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background: radial-gradient(
+    220px circle at var(--glow-x, 50%) var(--glow-y, 50%),
+    rgba(52, 176, 106, 0.14),
+    transparent 65%
+  );
+}
+.glow-card:hover::before {
+  opacity: 1;
+}
+
+/* chart tooltip */
+.chart-tooltip {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* new chat message: subtle fade/slide (GPU-friendly) */
+@keyframes msgIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.msg-in {
+  animation: msgIn 0.25s ease-out;
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .glow-card::before {
+    display: none;
+  }
+  .skeleton::after {
+    animation: none;
+  }
+}
