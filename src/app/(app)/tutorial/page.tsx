@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Header from "@/components/Header";
+import SetupStatusPanel from "@/components/SetupStatusPanel";
 
 const META_DOCS = {
   developers: "https://developers.facebook.com/",
@@ -291,9 +292,11 @@ export default function TutorialPage() {
           </div>
         </section>
 
+        {/* STATUS LIVE */}
+        <SetupStatusPanel />
+
         {/* CHECKLIST */}
-        <section aria-label="Checklist setup" className="rounded-2xl border border-stone-soft bg-white p-5 dark:border-night-600 dark:bg-night-800">
-          <h2 className="text-sm font-bold text-brand-900 dark:text-night-100">Checklist — centang yang udah beres</h2>
+        <section aria-label="Checklist setup" className="rounded-2xl border border-stone-soft bg-white p-5 dark:border-night-600 dark:bg-night-800">          <h2 className="text-sm font-bold text-brand-900 dark:text-night-100">Checklist — centang yang udah beres</h2>
           <ol className="mt-3 space-y-1.5">
             {CHECKLIST.map((label, i) => (
               <li key={label}>
