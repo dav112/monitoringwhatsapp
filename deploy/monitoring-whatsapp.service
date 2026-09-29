@@ -1,0 +1,21 @@
+[Unit]
+Description=Monitoring WhatsApp (Next.js, single instance)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=wapp
+WorkingDirectory=/opt/monitoring-whatsapp
+Environment=NODE_ENV=production
+Environment=PORT=3000
+# Secret dari file milik wapp:0600 (BUKAN dari repo)
+EnvironmentFile=/opt/monitoring-whatsapp/.env
+ExecStart=/usr/bin/npm run start -- -p 3000
+Restart=always
+RestartSec=5
+# Single instance: JANGAN jalankan >1 replika (SSE bus + rate limiter in-memory)
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
